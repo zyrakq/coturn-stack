@@ -1,0 +1,16 @@
+services:
+  coturn:
+    container_name: coturn
+    image: docker.io/coturn/coturn
+    restart: unless-stopped
+    network_mode: "host"
+    configs:
+      - source: turnserver
+        target: /etc/coturn/turnserver.conf
+
+configs:
+  turnserver:
+    content: |
+      use-auth-secret
+      static-auth-secret=${COTURN_SECRET_KEY}
+      realm=${COTURN_DOMAIN}
