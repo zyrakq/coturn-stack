@@ -4,6 +4,11 @@ services:
     image: docker.io/coturn/coturn
     restart: unless-stopped
     network_mode: "host"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: 3
     configs:
       - source: turnserver
         target: /etc/coturn/turnserver.conf
