@@ -1,0 +1,27 @@
+services:
+  coturn:
+    container_name: coturn
+    image: docker.io/coturn/coturn
+    restart: unless-stopped
+    network_mode: "host"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: 3
+    configs:
+      - source: turnserver
+        target: /etc/coturn/turnserver.conf
+    volumes:
+      - letsencrypt-certs:/certs
+configs:
+  turnserver:
+    content: |
+      use-auth-secret
+      static-auth-secret=${COTURN_SECRET_KEY}
+      realm=${COTURN_DOMAIN}
+      cert=/certs/${COTURN_DOMAIN}/fullchain.pem
+      pkey=/certs/${COTURN_DOMAIN}/key.pem
+volumes:
+  letsencrypt-certs:
+    external: true

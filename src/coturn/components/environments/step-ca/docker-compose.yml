@@ -1,0 +1,17 @@
+services:
+  coturn:
+    volumes:
+      - step-ca-certs:/certs
+
+configs:
+  turnserver:
+    content: |
+      use-auth-secret
+      static-auth-secret=${COTURN_SECRET_KEY}
+      realm=${COTURN_DOMAIN}
+      cert=/certs/${COTURN_DOMAIN}/fullchain.pem
+      pkey=/certs/${COTURN_DOMAIN}/key.pem
+
+volumes:
+  step-ca-certs:
+    external: true
