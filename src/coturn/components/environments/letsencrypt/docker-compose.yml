@@ -1,5 +1,18 @@
 services:
+  fix-certs:
+    container_name: fix-certs
+    image: busybox
+    user: "root"
+    environment:
+      LETSENCRYPT_HOST: ${COTURN_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - letsencrypt-certs:/certs
+    command: sh -c "chmod 644 /certs/${COTURN_DOMAIN}/key.pem 2>/dev/null || true; echo 'Permissions fixed'"
   coturn:
+    depends_on:
+      fix-certs:
+        condition: service_completed_successfully
     volumes:
       - letsencrypt-certs:/certs
 

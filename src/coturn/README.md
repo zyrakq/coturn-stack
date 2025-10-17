@@ -189,6 +189,7 @@ const iceServers = [
 ### Common Issues
 
 - **SSL Certificate Issues**: Check Let's Encrypt/Step CA configuration and certificate paths
+- **TLS Permission Issues**: When using TURNS (TLS), the `fix-certs` command is required to fix file permissions. COTURN runs as `nobody` user and cannot read SSL certificates without proper permissions
 - **Network Connectivity**: Ensure proper firewall configuration for TURN ports
 - **Authentication Issues**: Verify secret key configuration
 - **Port Conflicts**: Check that required ports are available
