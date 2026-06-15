@@ -1,24 +1,25 @@
 x-logging: &default-logging
-  driver: "json-file"
+  driver: json-file
   options:
-    max-size: "${LOG_MAX_SIZE:-10m}"
-    max-file: "${LOG_MAX_FILE:-3}"
-    compress: "${LOG_COMPRESS:-true}"
+    max-size: ${LOG_MAX_SIZE:-10m}
+    max-file: ${LOG_MAX_FILE:-3}
+    compress: ${LOG_COMPRESS:-true}
 services:
   coturn:
     container_name: coturn
     image: ${IMAGE:-docker.io/coturn/coturn}
     restart: unless-stopped
-    network_mode: "host"
+    network_mode: host
     logging: *default-logging
     configs:
       - source: turnserver
         target: /etc/coturn/turnserver.conf
+    volumes:
+      - coturn-data:/var/lib/coturn
+      - letsencrypt-certs:/certs
     depends_on:
       fix-certs:
         condition: service_completed_successfully
-    volumes:
-      - letsencrypt-certs:/certs
   fix-certs:
     container_name: fix-certs
     image: busybox
@@ -38,5 +39,7 @@ configs:
       cert=/certs/${COTURN_DOMAIN}/fullchain.pem
       pkey=/certs/${COTURN_DOMAIN}/key.pem
 volumes:
+  coturn-data:
+    name: coturn-data
   letsencrypt-certs:
     external: true
