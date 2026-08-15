@@ -6,20 +6,20 @@ Complete Docker-based COTURN TURN/STUN server deployment with SSL certificate ma
 
 ### 🔐 SSL Automation
 
-#### [🔒 Let's Encrypt Manager](src/ssl-automation/letsencrypt-manager)
+#### [🔒 Let's Encrypt Manager](modules/ssl-automation/letsencrypt-manager)
 
 Automatic SSL certificate management from Let's Encrypt for production deployments. Provides seamless HTTPS integration for Docker containers using nginx-proxy and acme-companion.
-[Learn more about Let's Encrypt Manager configuration](src/ssl-automation/letsencrypt-manager/README.md).
+[Learn more about Let's Encrypt Manager configuration](modules/ssl-automation/letsencrypt-manager/README.md).
 
-#### [🏠 Step CA Manager](src/ssl-automation/step-ca-manager)
+#### [🏠 Step CA Manager](modules/ssl-automation/step-ca-manager)
 
 Local domain stack with trusted self-signed certificates for virtual network deployments. Includes private CA management and local DNS resolution for development environments.
-[Learn more about Step CA Manager configuration](src/ssl-automation/step-ca-manager/README.md).
+[Learn more about Step CA Manager configuration](modules/ssl-automation/step-ca-manager/README.md).
 
-### 🔄 [COTURN Server](src/coturn/)
+### 🔄 [COTURN Server](app/)
 
 Modular Docker Compose configuration system for COTURN TURN/STUN server with support for multiple environments and SSL certificate integration. Provides production-ready TURN server deployment for WebRTC applications and Matrix homeserver voice/video calling.
-[Learn more about COTURN configuration](src/coturn/README.md).
+[Learn more about COTURN configuration](app/README.md).
 
 ## 🚀 Quick Start
 
@@ -38,7 +38,7 @@ Each component has its own README with detailed setup instructions. Choose the c
 
 ```bash
 # 1. Build COTURN configurations
-cd src/coturn/
+cd app/
 sb build
 
 # 2. Choose your deployment scenario
@@ -97,7 +97,7 @@ All services use modular Docker Compose configurations with:
 
 ```bash
 # COTURN with basic configuration
-cd src/coturn/build/basic/
+cd app/build/basic/
 docker-compose up -d
 ```
 
@@ -105,11 +105,11 @@ docker-compose up -d
 
 ```bash
 # COTURN with Let's Encrypt SSL
-cd src/coturn/build/letsencrypt/
+cd app/build/letsencrypt/
 docker-compose up -d
 
 # COTURN with Step CA SSL
-cd src/coturn/build/step-ca/
+cd app/build/step-ca/
 docker-compose up -d
 ```
 
@@ -169,8 +169,8 @@ docker logs letsencrypt-companion  # or step-ca-manager
 
 ## 📚 Documentation
 
-- [COTURN Server Configuration](src/coturn/README.md)
-- [SSL Automation](src/ssl-automation/)
+- [COTURN Server Configuration](app/README.md)
+- [SSL Automation](modules/ssl-automation/)
 - [Official COTURN Documentation](https://github.com/coturn/coturn)
 - [WebRTC Documentation](https://webrtc.org/)
 
