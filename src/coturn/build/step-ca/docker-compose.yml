@@ -7,7 +7,17 @@ x-logging: &default-logging
 services:
   coturn:
     container_name: coturn
-    image: ${IMAGE:-docker.io/coturn/coturn}
+    image: coturn
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ${IMAGE:-coturn/coturn}
+        USER root
+        RUN apt-get update \
+            && apt-get install -y --no-install-recommends gosu \
+            && rm -rf /var/lib/apt/lists/* \
+            && ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
+        USER nobody:nogroup
     restart: unless-stopped
     network_mode: host
     logging: *default-logging
@@ -17,19 +27,34 @@ services:
     volumes:
       - coturn-data:/var/lib/coturn
       - step-ca-certs:/certs
-    depends_on:
-      fix-certs:
-        condition: service_completed_successfully
-  fix-certs:
-    container_name: fix-certs
-    image: busybox
-    user: "root"
+    user: root
     environment:
+      COTURN_DOMAIN: ${COTURN_DOMAIN}
+      VIRTUAL_HOST: ${COTURN_DOMAIN}
+      VIRTUAL_PORT: 3478
       LETSENCRYPT_HOST: ${COTURN_DOMAIN}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
-    volumes:
-      - letsencrypt-certs:/certs
-    command: sh -c "chmod 644 /certs/${COTURN_DOMAIN}/key.pem 2>/dev/null || true; echo 'Permissions fixed'"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -x
+        echo "==> COTURN_DOMAIN='$$COTURN_DOMAIN'"
+        KEY_PATH="/certs/$$COTURN_DOMAIN/key.pem"
+
+        while [ ! -f "$$KEY_PATH" ]; do
+          echo "Waiting for $$KEY_PATH..."
+          sleep 3
+        done
+
+        chmod 644 "$$KEY_PATH" 2>/dev/null || true
+        echo "Permissions fixed. Starting as nobody..."
+
+        if [ $# -eq 0 ]; then
+          set -- --log-file=stdout --external-ip=$(detect-external-ip)
+        fi
+
+        exec gosu nobody /usr/local/bin/docker-entrypoint.sh "$@"
 configs:
   turnserver:
     content: |

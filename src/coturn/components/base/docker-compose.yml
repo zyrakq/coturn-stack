@@ -8,7 +8,17 @@ x-logging: &default-logging
 services:
   coturn:
     container_name: coturn
-    image: ${IMAGE:-docker.io/coturn/coturn}
+    image: coturn
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ${IMAGE:-coturn/coturn}
+        USER root
+        RUN apt-get update \
+            && apt-get install -y --no-install-recommends gosu \
+            && rm -rf /var/lib/apt/lists/* \
+            && ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
+        USER nobody:nogroup
     restart: unless-stopped
     network_mode: host
     logging: *default-logging
